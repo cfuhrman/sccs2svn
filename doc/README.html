@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"
+>
+<html>
+    <head>
+        <title>sccs2svn</title>
+        <meta name="GENERATOR" content="Quanta Plus">
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    </head>
+    <body>
+        <H1>
+             sccs2svn
+        </H1>
+        <p>
+             sccs2svn is a Python script written by<A href="Robert Zeh" name="http://home.earthlink.net/~rzeh">Robert Zeh</A> that converts SCCS repositories to a Subversion repository. It was originally written to convert Error Free Software's SCCS repositories to Subversion, but my boss Alexie Gitter allowed me to release it to the outside world. Since then it has grown by gradual accretion as people report bugs and provide fixes.
+        </p>
+        <p>
+             The script assumes that your SCCS repositories are structure in a hierarchy, where each directory has its own SCCS directory:
+            <ul>
+                <li>
+                     trunk
+                </li>
+                <li>
+                     trunk/SCCS
+                </li>
+                <li>
+                     docs
+                </li>
+                <ul>
+                    <li>
+                         SCCS
+                    </li>
+                    <LI>
+                         README.txt
+                    </LI>
+                </ul>
+                <li>
+                     src
+                <ul>
+                    <LI>
+                         project1
+                    <ul>
+                        <LI>
+                             SCCS
+                        </LI>
+                        <li>
+                             main.c
+                        </LI>
+                        </li>
+                    </ul>
+                </ul>
+                <ul>
+                    <LI>
+                         project2
+                    <ul>
+                        <LI>
+                             SCCS
+                        </LI>
+                        <li>
+                             main.c
+                        </LI>
+                        </li>
+                    </ul>
+                </ul>
+            </ul>
+             The structure will be replicated in the newly created Subversion repository, minus the SCCS directories.
+        </p>
+        <p>
+             The script was originally hosted on my web site but has been moved to Berlios, an open source repository.
+        </p>
+        <a href="http://developer.berlios.de">
+<img src="http://developer.berlios.de/bslogo.php?group_id=5950" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+    </body>
+</html>
