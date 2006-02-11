@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<project name="sccs2svn" >
+ <target name="dist" >
+  <zip zipfile="sccs2svn-0.24.zip"
+       basedir="."
+       includes="doc/* src/* tests/*" />
+ </target>
+
+<!-- My ant install is a bit broken, and berlios is rejected by hostkey anyway. -->
+<taskdef
+classname="org.apache.tools.ant.taskdefs.optional.ssh.Scp" name="scp" />
+ <target name="doc-upload">
+  <scp file="doc/README.html" todir="razeh:${password}@shell.berlios.de:/home/groups/sccs2svn/htdocs/index.html" />
+ </target>
+ <target name="dist-upload" depends="dist" >
+  <scp file="sccs2vn-0.24.zip" todir="razeh:${password}@shell.berlios.de:/home/groups/ftp/pub/sccs2svn" />
+ </target>
+
+</project>
