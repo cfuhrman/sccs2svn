@@ -1,10 +1,20 @@
 <?xml version="1.0" ?>
 <project name="sccs2svn" >
- <target name="dist" >
-  <zip zipfile="sccs2svn-0.24.zip"
+ <property name="version" value="0.24"/>
+ <target name="dist" depends="clean">
+  <zip zipfile="sccs2svn-${version}.zip"
        basedir="."
-       includes="doc/* src/* tests/*" />
+       includes="doc/** src/** tests/** tests/**/SCCS/**"
+       excludes="**/.svn/** **/*~"
+       defaultexcludes="false" /> <!-- We don't want SCCS directories excluded -->
  </target>
+
+ <target name="clean" >
+   <delete file="sccs2svn-${version}.zip" />
+   <delete dir= "tests/test01/auth" />
+   <delete dir= "tests/test01/test01-svn" />
+ </target>
+
 
 <!-- My ant install is a bit broken, and berlios is rejected by hostkey anyway. -->
 <taskdef
@@ -13,7 +23,7 @@ classname="org.apache.tools.ant.taskdefs.optional.ssh.Scp" name="scp" />
   <scp file="doc/README.html" todir="razeh:${password}@shell.berlios.de:/home/groups/sccs2svn/htdocs/index.html" />
  </target>
  <target name="dist-upload" depends="dist" >
-  <scp file="sccs2vn-0.24.zip" todir="razeh:${password}@shell.berlios.de:/home/groups/ftp/pub/sccs2svn" />
+  <scp file="sccs2vn-${version}.zip" todir="razeh:${password}@shell.berlios.de:/home/groups/ftp/pub/sccs2svn" />
  </target>
 
 </project>
