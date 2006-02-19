@@ -35,10 +35,10 @@
     Version .2 --- only replace the project name once.
 
 
-
+    The project's homepage is http://sccs2svn.berlios.de
 
     Robert Allan Zeh (razeh@yahoo.com or razeh@earthlink.net)
-    November 13th, 2005
+    Febuary 19th, 2006
 
 """
 
