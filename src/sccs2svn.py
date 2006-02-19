@@ -23,10 +23,10 @@
     to replace some of the SCCS keyword identifiers with the Subversion
     keywords.  You may wish to customize this for your installation.
 
-    Todo: Check the result of creating the repository by calling svnadmin create.
     Todo: Dates from different timezones may not be handled properly.
 
-    Version .24 --- break up large filesets.
+    Version .25 --- check the svnadmin result
+    Version .24 --- break up large filesets (thanks to Stephen Lau)
     Version .23 --- no longer uses the string module
     Version .22 --- close the popen result ourself
 
@@ -456,8 +456,10 @@ if __name__ == '__main__':
         print "Exiting."
         sys.exit(1)
         
-    os.system("svnadmin create " + options.svn_repository)
-
+    svnadminResult = os.system("svnadmin create " + options.svn_repository)
+    if svnadminResult != 0:
+        print "svnadmin returned %s instead of 0" % svnadminResult
+        sys.exit(2)
 
     core.run_app(run)
     

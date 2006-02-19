@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <project name="sccs2svn" >
- <property name="version" value="0.24"/>
+ <property name="version" value="0.25"/>
  <target name="dist" depends="clean">
   <zip zipfile="sccs2svn-${version}.zip"
        basedir="."
-       includes="doc/** src/** tests/** tests/**/SCCS/**"
+       includes="doc/** src/** tests/** tests/**/SCCS/** ChangeLog"
        excludes="**/.svn/** **/*~"
        defaultexcludes="false" /> <!-- We don't want SCCS directories excluded -->
  </target>
