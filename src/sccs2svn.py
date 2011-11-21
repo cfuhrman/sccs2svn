@@ -233,6 +233,8 @@ class SVNInterface:
                                                     None, None, subpool)
                 svn.delta.svn_txdelta_send_string(delta.getFileContents(),
                                                   handler, baton, subpool)
+                if delta.version.isdigit:
+                    fs.change_node_prop(root, subversionPath, 'sccs:sid', delta.version, subpool)
                 print "sending ", subversionPath, delta.getDate()
 
             print "committing version ",
