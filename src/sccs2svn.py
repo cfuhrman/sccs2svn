@@ -236,7 +236,7 @@ class SVNInterface:
                                                   handler, baton, subpool)
                 if delta.version.isdigit:
                     fs.change_node_prop(root, subversionPath, 'sccs:sid', delta.version, subpool)
-                print "sending ", subversionPath, delta.getDate()
+                print "sending ", subversionPath, delta.getDate(), "by", delta.author
 
             print "committing version ",
             print self._commit(revision, delta.getDate(), transaction, subpool)
