@@ -71,6 +71,7 @@ def isTextFilename(filename):
 def keywordSubstitution(input):
     """ Switches the input string from SCCS key words to Subversion keywords."""
     replacement = re.sub("%W%(\s+)%G%","$Id:$", input)
+    replacement = re.sub("%W%(\s+|\t+)\(\w+\) %G%","$Id:$", input)
     replacement = re.sub("%W%", "$URL:$", replacement)
     replacement = re.sub("%G%", "$LastChangedDate:$", replacement)
     return replacement
