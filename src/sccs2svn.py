@@ -216,6 +216,7 @@ class SVNInterface:
             # to cross transactions, which is bad.
             for delta in new_deltas:
                 self._addDirectories(delta)
+                print "preparing %s version %s by %s" % (delta.pathname, delta.version, delta.author)
 
             subpool = core.svn_pool_create(self.pool)
             (revision, transaction, root) = self._revisionSetup(subpool,
