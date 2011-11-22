@@ -163,8 +163,8 @@ class SVNInterface:
     def _revisionSetup(self, subpool, author, message):
         """ All of the setup for performing a revision. """
         revision = fs.youngest_rev(self.fsob, subpool)
-        re.sub("\r\n", "\n", message) # Convert CRLF to LF
-        re.sub("\r", "\n", message)   # Convert CR to LF
+        message = re.sub('\r\n', '<CRLF>\n', message) # Convert CRLF to LF
+        message = re.sub('\r', '<CR>', message)       # Convert CR to LF
         transaction = repos.svn_repos_fs_begin_txn_for_commit(self.repos_ptr,
                                                               revision, 
                                                               author, message,
