@@ -163,6 +163,8 @@ class SVNInterface:
     def _revisionSetup(self, subpool, author, message):
         """ All of the setup for performing a revision. """
         revision = fs.youngest_rev(self.fsob, subpool)
+        re.sub("\r\n", "\n", message) # Convert CRLF to LF
+        re.sub("\r", "\n", message)   # Convert CR to LF
         transaction = repos.svn_repos_fs_begin_txn_for_commit(self.repos_ptr,
                                                               revision, 
                                                               author, message,
@@ -352,8 +354,6 @@ def parseSCCSLog(filename):
     commentMode = 0
     comments = ""
     for i in log:
-        re.sub("\r\n", "\n", i) # Convert CRLF to LF
-        re.sub("\r", "\n", i)   # Convert CR to LF
         if i[0:len(endOfCommentMarker)] == endOfCommentMarker:
             versions.append(SCCSDelta(filename, version, user, dateTime, comments.decode('8859').encode('utf8', 'replace')))
             commentMode = 0
