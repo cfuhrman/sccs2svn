@@ -351,8 +351,8 @@ def parseSCCSLog(filename):
     commentMode = 0
     comments = ""
     for i in log:
-        re.sub("\r\n", "\n", comments) # Convert CRLF to LF
-        re.sub("\r", "\n", comments)   # Convert CR to LF
+        re.sub("\r\n", "\n", i) # Convert CRLF to LF
+        re.sub("\r", "\n", i)   # Convert CR to LF
         if i[0:len(endOfCommentMarker)] == endOfCommentMarker:
             versions.append(SCCSDelta(filename, version, user, dateTime, comments.decode('8859').encode('utf8', 'replace')))
             commentMode = 0
