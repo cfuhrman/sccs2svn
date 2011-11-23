@@ -218,7 +218,7 @@ class SVNInterface:
             # to cross transactions, which is bad.
             for delta in new_deltas:
                 self._addDirectories(delta)
-                print "preparing %s version %s by %s" % (delta.pathname, delta.version, delta.author)
+                print "preparing %s version %s (%s) by %s" % (delta.pathname, delta.version, time.strftime("%Y-%m-%d %H:%M:%S", delta.date), delta.author)
 
             subpool = core.svn_pool_create(self.pool)
             (revision, transaction, root) = self._revisionSetup(subpool,
@@ -240,6 +240,7 @@ class SVNInterface:
                 if delta.version.isdigit:
                     fs.change_node_prop(root, subversionPath, 'sccs:sid', delta.version, subpool)
                 print "sending ", subversionPath, delta.getDate(), "by", delta.author
+
 
             print "committing version ",
             print self._commit(revision, delta.getDate(), transaction, subpool)
@@ -395,14 +396,19 @@ def run(pool):
         sys.exit(1)
 
     # Merge deltas together.
-    mergedVersions = [[versions[0]]]
-    i = 0
-    while i < len(versions):
-        if versions[i].match(mergedVersions[-1][-1]):
-            mergedVersions[-1].append(versions[i])
+    mergedVersions = []
+    mergedVersion  = [versions[0]]
+    vptr = 1
+    while vptr < len(versions):
+        version = versions[vptr]
+        if mergedVersion[-1].match(version):
+            mergedVersion.append(version)
         else:
-            mergedVersions.append([versions[i]])
-        i += 1
+            mergedVersions.append(mergedVersion)
+            mergedVersion = [version]
+        vptr += 1
+
+    mergedVersions.append(mergedVersion) # last item
 
     print "consolidated length = ", len(mergedVersions)
     
