@@ -150,15 +150,14 @@ class SVNInterface:
         
     def _commit(self, rev, date, txn, subpool):
         """ Commit the supplied transaction to Subversion. """
-        fs.change_rev_prop(self.fsob, rev,
-                           core.SVN_PROP_ENTRY_COMMITTED_DATE,
-                           date, subpool)
-
-        fs.change_rev_prop(self.fsob, rev,
+        svn_rev = repos.svn_repos_fs_commit_txn(self.repos_ptr, txn, subpool)
+        fs.change_rev_prop(self.fsob, svn_rev,
                            core.SVN_PROP_REVISION_DATE,
                            date, subpool)
-
-        return repos.svn_repos_fs_commit_txn(self.repos_ptr, txn, subpool)
+        fs.change_rev_prop(self.fsob, svn_rev,
+                           core.SVN_PROP_ENTRY_COMMITTED_DATE,
+                           date, subpool)
+        return svn_rev
 
     def _revisionSetup(self, subpool, author, message):
         """ All of the setup for performing a revision. """
