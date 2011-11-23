@@ -311,80 +311,6 @@ class SVNInterface:
                            transaction, subpool)
         core.svn_pool_destroy(subpool)
 
-
-    def propertyUpdate(self, filenames):
-        """ Set the keywords property for the supplied filenames. """
-        # Split up the filenames array into smaller sub-arrays, otherwise
-        # we choke running out of memory due to a really large SCCS
-	# repository like ON
-        while len(filenames):
-	    if len(filenames) > 3000:
-                print "partitioning filenames into smaller new_filenames"
-            new_filenames = filenames[:3000]
-	    filenames = filenames[3000:]
-
-            """ Set the keywords property for the supplied filenames. """
-            subpool = core.svn_pool_create(self.pool)
-            (revision,
-             transaction,
-             root) = self._revisionSetup(subpool,
-                                     options.userid,
-                                     "Automated property set")
-            for filename in new_filenames:
-                if isTextFilename(filename):
-                    print "property set for ", filename
-                    fs.change_node_prop(root, filename,
-                                        core.SVN_PROP_KEYWORDS,
-                                        "LastChangedDate LastChangedRevision LastChangedBy HeadURL Id",
-                                        subpool)
-                    fs.change_node_prop(root, filename,
-                                        core.SVN_PROP_EOL_STYLE,
-                                        "native",
-                                        subpool)
-                else:
-                    print "skipping property set for ", filename
-                
-            self._commit(revision, subversionTime(time.localtime()),
-                                 transaction, subpool)
-            core.svn_pool_destroy(subpool)
-
-    def idKeyUpdate(self, deltas):
-        """ Convert the SCCS keywords inside of the supplied deltas to
-        subversion keywords. """
-        # Split up the deltas array into smaller sub-arrays, otherwise
-        # we choke running out of memory due to really large changesets
-        # like the CDDL 2005/06/08 putback in ON that touched every file
-        while len(deltas):
-	    if len(deltas) > 1000:
-                print "partitioning deltas into smaller new_deltas"
-            new_deltas = deltas[:1000]
-	    deltas = deltas[1000:]
-
-            """ Convert the SCCS keywords inside of the supplied deltas to
-            subversion keywords. """
-            subpool = core.svn_pool_create(self.pool)
-            (revision,
-             transaction,
-             root) = self._revisionSetup(subpool,
-                                         options.userid,
-                                         "Automated keyword replacement")
-            for delta in new_deltas:
-                if isTextFilename(delta.getFilename()):
-                    originalContents = delta.getFileContents("-k")
-                    updatedContents = keywordSubstitution(originalContents)
-                    if originalContents != updatedContents:
-                        handler, baton = fs.apply_textdelta(root,
-                                                     delta.getRepositoryName(),
-                                                     None, None, subpool)
-                        svn.delta.svn_txdelta_send_string(updatedContents,
-                                                     handler, baton, subpool)
-                        print "sending ", delta.getRepositoryName()
-
-            print "committing version ",
-            print self._commit(revision, delta.getDate(), transaction, subpool)
-            core.svn_pool_destroy(subpool)
-
-
 def deltaSort(deltaOne, deltaTwo):
     """ Sort two deltas based on their time. """
     if time.mktime(deltaOne.date) < time.mktime(deltaTwo.date):
@@ -472,8 +398,6 @@ def run(pool):
         filenames[i.getRepositoryName()] = i
 
     # Update their properties and keywords.
-    #interface.propertyUpdate(filenames.keys())
-    #interface.idKeyUpdate(filenames.values())
     interface.keywordPropertyUpdate(filenames)
 
     # Delete any file ending in '-'
