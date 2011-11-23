@@ -260,7 +260,58 @@ class SVNInterface:
                      transaction, subpool)
 
         core.svn_pool_destroy(subpool)
+
+    def keywordPropertyUpdate(self, files):
+        """ Does the following to text files:
         
+            1) Sets svn:keywords property
+            2) Replace SCCS keywords with SVN equivalents
+
+            Note that while this will be treated as a separate transaction, 
+            the transaction date will be set to the last known date for the
+            given file
+        """
+
+        subpool = core.svn_pool_create(self.pool)
+        (revision, transaction, root ) = \
+            self._revisionSetup(subpool, options.userid,
+                                "Automated SCCS -> svn:keyword conversion\n")
+
+        for filename, version in files.iteritems():
+            if isTextFilename(filename):
+                print filename + ":"
+                print " ... Setting svn:keywords property"
+                fs.change_node_prop(root, filename,
+                                    core.SVN_PROP_KEYWORDS,
+                                    "LastChangedDate LastChangedRevision LastChangedBy HeadURL Id",
+                                    subpool)
+                fs.change_node_prop(root, filename,
+                                    core.SVN_PROP_EOL_STYLE,
+                                    "native",
+                                    subpool)
+                oldFileContents = version.getFileContents("-k")
+                newFileContents = keywordSubstitution(oldFileContents)
+                if oldFileContents != newFileContents:
+                    print " ... keywords converted"
+                    handler, baton = fs.apply_textdelta(root,
+                                                        version.getRepositoryName(),
+                                                        None, None, subpool)
+                    svn.delta.svn_txdelta_send_string(newFileContents,
+                                                      handler, baton, subpool)
+                    print " ... sending"
+            else:
+                print "skipping ", filename
+
+            # Note we must unset sccs:sid since it no longer applies
+            fs.change_node_prop(root, filename,
+                                'sccs:sid', None, subpool)
+
+        print "committing version ",
+        print self._commit(revision, subversionTime(time.localtime()),
+                           transaction, subpool)
+        core.svn_pool_destroy(subpool)
+
+
     def propertyUpdate(self, filenames):
         """ Set the keywords property for the supplied filenames. """
         # Split up the filenames array into smaller sub-arrays, otherwise
@@ -421,8 +472,9 @@ def run(pool):
         filenames[i.getRepositoryName()] = i
 
     # Update their properties and keywords.
-    interface.propertyUpdate(filenames.keys())
-    interface.idKeyUpdate(filenames.values())
+    #interface.propertyUpdate(filenames.keys())
+    #interface.idKeyUpdate(filenames.values())
+    interface.keywordPropertyUpdate(filenames)
 
     # Delete any file ending in '-'
     #versionsToDelete = {}
