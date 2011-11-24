@@ -372,6 +372,9 @@ def visitSCCSRepository(interface,dirname,names):
         print "Visiting ", dirname
         for i in names:
             if i[0:2] == "s.":
+                if re.match(".*[-.]bad$", i):
+                    print "---> Skipping bad sccs file " + i
+                    continue
                 filename = os.path.join(dirname, i)
                 parseSCCSLog(filename)
 
