@@ -43,9 +43,12 @@
 """
 
 from svn import fs, repos, core, client, delta
+from pytz import timezone
+from datetime import tzinfo, datetime
 import svn
 import os
 import time
+import pytz
 import re
 import shutil
 import sys
@@ -58,10 +61,12 @@ except ImportError:
     
 
 versions = []
+localtz = timezone('US/Pacific') # Set as appropriate
+utc_tz = pytz.utc
 
 def subversionTime(t):
     """ Converts a time tuple to what subversion expects. """
-    return time.strftime("%Y-%m-%dT%H:%M:%S.000000Z", t)
+    return t.astimezone(utc_tz).strftime("%Y-%m-%dT%H:%M:%S.000000Z")
 
 def isTextFilename(filename):
     """ Determines if we should consider the filename to be a text file. """
@@ -217,7 +222,7 @@ class SVNInterface:
             # to cross transactions, which is bad.
             for delta in new_deltas:
                 self._addDirectories(delta)
-                print "preparing %s version %s (%s) by %s" % (delta.pathname, delta.version, time.strftime("%Y-%m-%d %H:%M:%S", delta.date), delta.author)
+                print "preparing %s version %s (%s) by %s" % (delta.pathname, delta.version, delta.date, delta.author)
 
             subpool = core.svn_pool_create(self.pool)
             (revision, transaction, root) = self._revisionSetup(subpool,
@@ -307,17 +312,18 @@ class SVNInterface:
                                 'sccs:sid', None, subpool)
 
         print "committing version ",
-        print self._commit(revision, subversionTime(time.localtime()),
+        print self._commit(revision, subversionTime(localtz.localize(datetime.now())),
                            transaction, subpool)
         core.svn_pool_destroy(subpool)
 
 def deltaSort(deltaOne, deltaTwo):
     """ Sort two deltas based on their time. """
-    if time.mktime(deltaOne.date) < time.mktime(deltaTwo.date):
+    if deltaOne.date < deltaTwo.date:
         return -1
-    if time.mktime(deltaOne.date) > time.mktime(deltaTwo.date):
+    elif deltaOne.date > deltaTwo.date:
         return 1
-    return 0
+    else:
+        return 0
 
 def parseSCCSLog(filename):
     """ Parse the SCCS log for the filename, and add all of its
@@ -343,7 +349,7 @@ def parseSCCSLog(filename):
             commentMode = 1
             (dummy, version, user, date, ti) = i.split("\t",4)
             ti = ti.rstrip()
-            dateTime = time.strptime(date + " " + ti, "%y/%m/%d %H:%M:%S")
+            dateTime = localtz.localize(datetime.strptime(date + " " + ti, "%y/%m/%d %H:%M:%S"))
             
 
 def visitSCCSRepository(interface,dirname,names):
