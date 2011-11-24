@@ -61,7 +61,7 @@ except ImportError:
     
 
 versions = []
-localtz = timezone('US/Pacific') # Set as appropriate
+localtz = timezone('UTC') # Set as appropriate
 utc_tz = pytz.utc
 
 def subversionTime(t):
@@ -431,6 +431,9 @@ if __name__ == '__main__':
     parser.add_option("-i", "--sccs-repository", dest="sccs_repository",
                       metavar="sccs root directory",
                       help="The location of the SCCS repository")
+    parser.add_option("-z", "--sccs-timezone", dest="sccs_timezone",
+                      metavar="sccs timezone",
+                      help="The timezone of the SCCS repository (default:UTC)")
     
     (options, args) = parser.parse_args()
 
@@ -448,6 +451,9 @@ if __name__ == '__main__':
         print "Repository directory %s already exists!" % options.svn_repository
         print "Exiting."
         sys.exit(1)
+
+    if options.sccs_timezone != None:
+        localtz = timezone(options.sccs_timezone)
         
     svnadminResult = os.system("svnadmin create " + options.svn_repository)
     if svnadminResult != 0:
