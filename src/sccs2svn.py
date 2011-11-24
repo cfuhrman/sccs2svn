@@ -276,13 +276,25 @@ class SVNInterface:
             the transaction date will be set to the last known date for the
             given file
         """
-
-        subpool = core.svn_pool_create(self.pool)
-        (revision, transaction, root ) = \
-            self._revisionSetup(subpool, options.userid,
-                                "Automated SCCS -> svn:keyword conversion\n")
-
+        # Break up files into groups of 1000 in order to avoid
+        # potential "Too many open files" errors thrown when
+        # committing large changesets
+        counter = 0
+ 
         for filename, version in files.iteritems():
+           
+            if counter%1000 == 0:
+                if counter > 1:
+                    print "committing version ",
+                    print self._commit(revision, subversionTime(localtz.localize(datetime.now())),
+                                       transaction, subpool)
+                    core.svn_pool_destroy(subpool)
+                    
+                subpool = core.svn_pool_create(self.pool)
+                (revision, transaction, root ) = \
+                    self._revisionSetup(subpool, options.userid,
+                                        "Automated SCCS -> svn:keyword conversion\n")
+
             if isTextFilename(filename):
                 print filename + ":"
                 print " ... Setting svn:keywords property"
@@ -310,7 +322,9 @@ class SVNInterface:
             # Note we must unset sccs:sid since it no longer applies
             fs.change_node_prop(root, filename,
                                 'sccs:sid', None, subpool)
-
+            counter += 1
+        
+        # Commit any stragglers
         print "committing version ",
         print self._commit(revision, subversionTime(localtz.localize(datetime.now())),
                            transaction, subpool)
