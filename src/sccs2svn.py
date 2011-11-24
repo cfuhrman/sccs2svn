@@ -99,7 +99,7 @@ class SCCSDelta:
         if self.author == otherDelta.author and \
            self.comment == otherDelta.comment and \
            self.pathname != otherDelta.pathname:
-            if abs(time.mktime(self.date) - time.mktime(otherDelta.date)) < 10:
+            if abs(self.date - otherDelta.date).seconds < 10:
                 return True
 
         return False
