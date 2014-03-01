@@ -159,9 +159,9 @@ class SVNInterface:
         fs.change_rev_prop(self.fsob, svn_rev,
                            core.SVN_PROP_REVISION_DATE,
                            date, subpool)
-        fs.change_rev_prop(self.fsob, svn_rev,
-                           core.SVN_PROP_ENTRY_COMMITTED_DATE,
-                           date, subpool)
+        #fs.change_rev_prop(self.fsob, svn_rev,
+        #                   core.SVN_PROP_ENTRY_COMMITTED_DATE,
+        #                   date, subpool)
         return svn_rev
 
     def _revisionSetup(self, subpool, author, message):
