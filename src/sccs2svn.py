@@ -40,6 +40,9 @@
     Robert Allan Zeh (razeh@yahoo.com or razeh@earthlink.net)
     Febuary 19th, 2006
 
+    Note: If you get an error about too many open files, 
+          check your ulimit settings
+
 """
 
 from svn import fs, repos, core, client, delta
@@ -143,8 +146,8 @@ class SVNInterface:
     """ Our interface to subversion """
 
     def __init__(self, repositoryPath, pool):
-        self.context = client.svn_client_ctx_t()
-        configDirectory = core.svn_config_ensure( '', pool) 
+        self.context = client.svn_client_create_context()
+        configDirectory = core.svn_config_ensure( '', pool)
         self.context.config = core.svn_config_get_config(configDirectory, pool)
         self.pool = pool
         self.repos_ptr = repos.svn_repos_open(repositoryPath, pool)
@@ -276,14 +279,15 @@ class SVNInterface:
             the transaction date will be set to the last known date for the
             given file
         """
-        # Break up files into groups of 1000 in order to avoid
+        # Break up files into groups in order to avoid
         # potential "Too many open files" errors thrown when
         # committing large changesets
         counter = 0
+        filesPerCommit = 256
  
         for filename, version in files.iteritems():
            
-            if counter%1000 == 0:
+            if counter%filesPerCommit == 0:
                 if counter > 1:
                     print "committing version ",
                     print self._commit(revision, subversionTime(localtz.localize(datetime.now())),
@@ -293,7 +297,7 @@ class SVNInterface:
                 subpool = core.svn_pool_create(self.pool)
                 (revision, transaction, root ) = \
                     self._revisionSetup(subpool, options.userid,
-                                        "Automated SCCS -> svn:keyword conversion\n")
+                                        "Automated SCCS keyword -> svn:keyword conversion\n")
 
             if isTextFilename(filename):
                 print filename + ":"
