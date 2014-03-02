@@ -425,7 +425,8 @@ def run(pool):
         filenames[i.getRepositoryName()] = i
 
     # Update their properties and keywords.
-    interface.keywordPropertyUpdate(filenames)
+    if options.convert_keywords:
+        interface.keywordPropertyUpdate(filenames)
 
     # Delete any file ending in '-'
     #versionsToDelete = {}
@@ -452,6 +453,9 @@ if __name__ == '__main__':
     parser.add_option("-i", "--sccs-repository", dest="sccs_repository",
                       metavar="sccs root directory",
                       help="The location of the SCCS repository")
+    parser.add_option("-k", "--convert-keywords", action="store_true",
+                      dest="convert_keywords",                      
+                      help="Convert SCCS keywords to SVN keywords");
     parser.add_option("-z", "--sccs-timezone", dest="sccs_timezone",
                       metavar="sccs timezone",
                       help="The timezone of the SCCS repository (default:UTC)")
